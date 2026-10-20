@@ -1,4 +1,4 @@
-# Quotist — Complete Project Documentation
+# Quotist - Complete Project Documentation
 
 > **Quotist** is a Windows-first desktop quotes generator built with **Electron** (UI), **Python** (backend) and **SQLite** (storage). It ships with a built-in quote library, can optionally pull more quotes from the DummyJSON API, and exports quotes to **PDF** or **TXT**. All data stays on the user's device.
 
@@ -49,7 +49,7 @@
 - **Theming**: 6 colour themes × dark/light mode.
 - **Code-editor-style quote card**: line numbers, traffic-light dots, file name (`quote_001.txt`), animated line reveal.
 - **Frameless transparent window** with custom minimize/close controls and a right-hand tab rail.
-- **Single instance** lock — launching a second copy focuses the existing window.
+- **Single instance** lock - launching a second copy focuses the existing window.
 - **Local-only data**: no telemetry, no account.
 
 ---
@@ -125,7 +125,7 @@ Approx. size: ~1,650 lines (backend 322 + 55, main 270ish, app.js 434, HTML 193,
 
 ---
 
-## 6. Backend (Python) — `backend/backend.py`
+## 6. Backend (Python) - `backend/backend.py`
 
 ### 6.1 Constants
 
@@ -145,16 +145,16 @@ Approx. size: ~1,650 lines (backend 322 + 55, main 270ish, app.js 434, HTML 193,
 
 | Action | Payload | Returns | Notes |
 |---|---|---|---|
-| `categories` | — | `["All", ...ordered, ...extra]` | Ordered by `CATEGORY_ORDER`, extras (e.g. "Online") sorted after |
-| `settings_get` | — | settings dict | |
+| `categories` | - | `["All", ...ordered, ...extra]` | Ordered by `CATEGORY_ORDER`, extras (e.g. "Online") sorted after |
+| `settings_get` | - | settings dict | |
 | `settings_set` | `{key, value}` | updated settings dict | Validates key, theme, mode, blur (clamped 0–60), booleans, category |
 | `generate` | `{category, keyword, last}` | quote object | See §6.4 |
-| `library_stats` | — | `{total, builtin, online}` | |
-| `library_sync` | — | `{added, partial, stats}` | Pages through DummyJSON; see §12 |
+| `library_stats` | - | `{total, builtin, online}` | |
+| `library_sync` | - | `{added, partial, stats}` | Pages through DummyJSON; see §12 |
 | `history_add` | `{text, author, category, created_at?}` | `{id}` | Manual save |
 | `history_list` | `{search?}` | list of rows, newest first | `LIKE` on text/author/category |
 | `history_delete` | `{id}` | `true` | |
-| `history_clear` | — | `true` | |
+| `history_clear` | - | `true` | |
 
 Unknown actions or any exception yield `{id, ok:false, error:"..."}`; the process never crashes on a bad request.
 
@@ -169,23 +169,23 @@ Unknown actions or any exception yield `{id, ok:false, error:"..."}`; the proces
 
 ---
 
-## 7. Electron Main Process — `main.js`
+## 7. Electron Main Process - `main.js`
 
 Responsibilities:
 
-- **Backend process management** — `backendCommand()` picks the bundled `quotist_backend(.exe)` from `process.resourcesPath/backend` when packaged, otherwise runs `python` (Windows) / `python3` with `backend/backend.py`. The DB path is `app.getPath("userData")/quotist.db`. `PYTHONIOENCODING=utf-8` is forced; `windowsHide: true` hides the console.
-- **Window** — 1080×720, frameless, transparent, non-resizable, no shadow, context isolation on, node integration off.
+- **Backend process management** - `backendCommand()` picks the bundled `quotist_backend(.exe)` from `process.resourcesPath/backend` when packaged, otherwise runs `python` (Windows) / `python3` with `backend/backend.py`. The DB path is `app.getPath("userData")/quotist.db`. `PYTHONIOENCODING=utf-8` is forced; `windowsHide: true` hides the console.
+- **Window** - 1080×720, frameless, transparent, non-resizable, no shadow, context isolation on, node integration off.
 - **IPC handlers**
   - `api` → forward to backend.
   - `export-text` / `export-pdf` → save dialog + write file (see §13).
   - `open-external` → opens a URL **only if it equals** `https://github.com/mayurcodes01`.
   - `win-min`, `win-max`, `win-close` → window controls.
-- **Sanitising** — `cleanItems()` caps exports at 5,000 items and coerces fields to strings; `escapeHtml()` protects the PDF HTML.
-- **Lifecycle** — single-instance lock, application menu removed, backend killed on `before-quit`, app quits when all windows close.
+- **Sanitising** - `cleanItems()` caps exports at 5,000 items and coerces fields to strings; `escapeHtml()` protects the PDF HTML.
+- **Lifecycle** - single-instance lock, application menu removed, backend killed on `before-quit`, app quits when all windows close.
 
 ---
 
-## 8. Preload Bridge — `preload.js`
+## 8. Preload Bridge - `preload.js`
 
 Exposes `window.quotist` via `contextBridge`:
 
@@ -225,12 +225,12 @@ Debounced (160 ms) search, item count, list of cards (quote, bold author, `#cate
 
 ### 9.4 Settings panel
 
-- **Theme**: 6 swatches — Aurora, Ocean, Sunset, Forest, Rose, Graphite — plus Dark/Light segmented control.
+- **Theme**: 6 swatches - Aurora, Ocean, Sunset, Forest, Rose, Graphite - plus Dark/Light segmented control.
 - **Behaviour**: *Auto-save quotes* and *Fetch online quotes* toggles.
 - **Library**: total / built-in / downloaded counts and a **Sync library** button.
 - **About**: version, stack, storage, author, GitHub button, and the Terms and Conditions.
 
-### 9.5 Styling — `styles.css`
+### 9.5 Styling - `styles.css`
 
 CSS custom properties drive everything: `html[data-mode]` sets neutrals (`--base`, `--surface`, `--text`, `--muted`, …) and `html[data-theme]` sets accent trio `--c1/--c2/--c3`. Fonts fall back from Inter / Segoe UI Variable to system UIs; code areas use JetBrains Mono → Cascadia → Consolas. Drag regions use `-webkit-app-region`. Window radius is 26 px.
 
@@ -275,18 +275,18 @@ Location: `<Electron userData>/quotist.db` (on Windows: `%APPDATA%\Quotist\quoti
 
 ---
 
-## 11. Built-in Quote Library — `backend/quotes_data.py`
+## 11. Built-in Quote Library - `backend/quotes_data.py`
 
 42 quotes stored as `(category, text, author)` tuples, converted to `QUOTES = [{category, text, author}]`.
 
 | Category | Count | Example |
 |---|---|---|
-| Motivation | 8 | "Fall seven times, stand up eight." — Japanese proverb |
-| Wisdom | 7 | "The unexamined life is not worth living." — Socrates |
-| Life | 7 | "Not all those who wander are lost." — J.R.R. Tolkien |
-| Success | 7 | "Stay hungry, stay foolish." — Steve Jobs |
-| Creativity | 7 | "Simplicity is the ultimate sophistication." — Leonardo da Vinci |
-| Courage | 6 | "Courage is grace under pressure." — Ernest Hemingway |
+| Motivation | 8 | "Fall seven times, stand up eight." - Japanese proverb |
+| Wisdom | 7 | "The unexamined life is not worth living." - Socrates |
+| Life | 7 | "Not all those who wander are lost." - J.R.R. Tolkien |
+| Success | 7 | "Stay hungry, stay foolish." - Steve Jobs |
+| Creativity | 7 | "Simplicity is the ultimate sophistication." - Leonardo da Vinci |
+| Courage | 6 | "Courage is grace under pressure." - Ernest Hemingway |
 
 `CATEGORY_ORDER` = Motivation, Wisdom, Life, Success, Creativity, Courage. To add quotes, append tuples to `_RAW`; they are inserted on next launch (existing rows are untouched).
 
@@ -317,14 +317,14 @@ Location: `<Electron userData>/quotist.db` (on Windows: `%APPDATA%\Quotist\quoti
 
 ## 14. Export Formats
 
-**Text (.txt)** — header `Quotist` + export timestamp, then each entry as:
+**Text (.txt)** - header `Quotist` + export timestamp, then each entry as:
 
 ```
 "quote text"
 Author (Category)
 ```
 
-**PDF (.pdf)** — an HTML document is rendered in a hidden sandboxed `BrowserWindow` and printed with `printToPDF` (A4, backgrounds on, margins 22 mm / 20 mm). Palatino/Georgia serif quotes with an accent left border, bold author, and a meta line (category + localised timestamp). Entries avoid page breaks inside.
+**PDF (.pdf)** - an HTML document is rendered in a hidden sandboxed `BrowserWindow` and printed with `printToPDF` (A4, backgrounds on, margins 22 mm / 20 mm). Palatino/Georgia serif quotes with an accent left border, bold author, and a meta line (category + localised timestamp). Entries avoid page breaks inside.
 
 Single-quote export uses the name "Quotist Quote"; history export uses "Quotist History". Cancelling the save dialog is handled silently.
 
