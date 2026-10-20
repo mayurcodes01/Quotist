@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="aurora" data-mode="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quotist</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <div class="stage">
+      <div class="dragbar"></div>
+
+      <main>
+        <!-- RUN -->
+        <section class="panel active" id="panel-generator">
+          <div class="gen">
+            <article class="editor" id="quoteCard">
+              <div class="editor-bar">
+                <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+                <span class="file" id="fileName">quote.txt</span>
+                <span class="chip hidden" id="quoteCat"></span>
+              </div>
+              <div class="editor-body">
+                <div class="gutter" id="gutter" aria-hidden="true"></div>
+                <div class="code" id="quoteLines"></div>
+              </div>
+              <div class="editor-foot">
+                <span class="status"><b></b><span id="sourceNote"></span></span>
+                <span class="meta" id="quoteMeta">ln 0</span>
+              </div>
+            </article>
+
+            <div class="prompt-bar">
+              <label class="prompt" for="keyword">
+                <span class="caret">&gt;</span>
+                <input id="keyword" type="text" placeholder="keyword or author" autocomplete="off" spellcheck="false">
+              </label>
+              <button class="btn primary run" id="btnGenerate" type="button">Generate <kbd>&crarr;</kbd></button>
+              <div class="tools">
+                <button class="btn ghost hidden" id="btnSave" type="button" disabled title="Save to history">save</button>
+                <button class="btn ghost" id="btnCopy" type="button" disabled title="Copy quote">copy</button>
+                <button class="btn ghost" id="btnTxt" type="button" disabled title="Export as text">.txt</button>
+                <button class="btn ghost" id="btnPdf" type="button" disabled title="Export as PDF">.pdf</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- LOG -->
+        <section class="panel" id="panel-history">
+          <div class="history-wrap">
+            <div class="toolbar">
+              <label class="prompt flex" for="historySearch">
+                <span class="caret">/</span>
+                <input id="historySearch" type="text" placeholder="search" autocomplete="off" spellcheck="false">
+              </label>
+              <span class="count" id="historyCount">0</span>
+              <button class="btn ghost" id="btnHistTxt" type="button">.txt</button>
+              <button class="btn ghost" id="btnHistPdf" type="button">.pdf</button>
+              <button class="btn ghost danger" id="btnHistClear" type="button">clear</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+            <div class="empty hidden" id="historyEmpty">
+              <p class="empty-title">// empty</p>
+              <p class="empty-body">Generated quotes will show up here.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- CFG -->
+        <section class="panel" id="panel-settings">
+          <div class="settings-grid">
+            <div class="card">
+              <h2>Theme</h2>
+              <div class="swatches" id="swatches"></div>
+              <div class="row">
+                <span>Appearance</span>
+                <div class="segmented" id="modeSeg">
+                  <button type="button" data-mode="dark">Dark</button>
+                  <button type="button" data-mode="light">Light</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h2>Behavior</h2>
+              <div class="row">
+                <div>
+                  <span>Auto-save quotes</span>
+                  <p class="hint tight">Off: use the save button.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="autoSave">
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </label>
+              </div>
+              <div class="row">
+                <div>
+                  <span>Fetch online quotes</span>
+                  <p class="hint tight">Falls back to your library when offline.</p>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="onlineEnabled">
+                  <span class="track"></span>
+                  <span class="thumb"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="card wide">
+              <h2>Library</h2>
+              <dl class="facts three">
+                <div><dt>total</dt><dd id="statTotal">0</dd></div>
+                <div><dt>built in</dt><dd id="statBuiltin">0</dd></div>
+                <div><dt>downloaded</dt><dd id="statOnline">0</dd></div>
+              </dl>
+              <div class="row">
+                <div>
+                  <span>Download the online collection</span>
+                  <p class="hint tight">Saved on this device for offline use.</p>
+                </div>
+                <button class="btn primary" id="btnSync" type="button">Sync library</button>
+              </div>
+            </div>
+
+            <div class="card wide">
+              <h2>About</h2>
+              <p class="body">
+                Quotist is a desktop quotes generator with an optional online source. Generate a quote, then export it as a PDF or text file.
+                Everything is stored locally on your device.
+              </p>
+              <dl class="facts">
+                <div><dt>version</dt><dd>1.1.0</dd></div>
+                <div><dt>stack</dt><dd>Electron, Python, SQLite</dd></div>
+                <div><dt>storage</dt><dd>Local database</dd></div>
+                <div><dt>author</dt><dd>mayurcodes01</dd></div>
+              </dl>
+              <button class="btn ghost" id="btnGithub" type="button">github &nearr;</button>
+
+              <h3>Terms and Conditions</h3>
+              <div class="terms" tabindex="0">
+                <ol>
+                  <li>Acceptance. By installing or using Quotist you agree to these terms.</li>
+                  <li>Personal use. Quotist is provided for personal and educational use.</li>
+                  <li>Quote content. Quotes are shown with their commonly cited authors. The wording of each quote remains the property of its author or rights holder, and attribution is given on a best effort basis.</li>
+                  <li>Your data. History, settings, and your quote library are stored in a local database on your device. Quotist does not collect, upload, or share your data.</li>
+                  <li>Online source. When the online source is turned on, Quotist requests quotes from the DummyJSON quotes service. Only the request itself is sent, and no personal information is transmitted. Fetched quotes are stored locally. The availability and content of that service are outside the author's control.</li>
+                  <li>Exports. You are responsible for how you use exported PDF and text files.</li>
+                  <li>No warranty. Quotist is provided as is, without warranty of any kind, express or implied.</li>
+                  <li>Liability. The author is not liable for any damages arising from the use of Quotist.</li>
+                  <li>Changes. These terms may change in future versions of the software.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Right-hand rail -->
+    <nav class="rail">
+      <div class="wc">
+        <button id="btnMin" class="amber" type="button" aria-label="Minimize" title="Minimize"></button>
+        <button id="btnClose" class="red" type="button" aria-label="Close" title="Close"></button>
+      </div>
+
+      <div class="tabs" id="tabs">
+        <span class="indicator" id="indicator"></span>
+        <button class="tab active" data-tab="generator" type="button" title="Generator" aria-label="Generator">
+          <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"></path></svg>
+          <i>run</i>
+        </button>
+        <button class="tab" data-tab="history" type="button" title="History" aria-label="History">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+          <i>log</i>
+        </button>
+        <button class="tab" data-tab="settings" type="button" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>
+          <i>cfg</i>
+        </button>
+      </div>
+
+      <span class="logo" aria-hidden="true">Q</span>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>

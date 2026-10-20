@@ -1,0 +1,51 @@
+{
+  "name": "quotist",
+  "version": "1.1.0",
+  "description": "Quotist Online, a quotes generator",
+  "main": "main.js",
+  "author": "mayurcodes01",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "build:backend": "pyinstaller --onefile --name quotist_backend --distpath build/backend --workpath pyi_work --specpath pyi_work backend/backend.py",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.mayurcodes01.quotist",
+    "productName": "Quotist",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "build/backend",
+        "to": "backend",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Quotist"
+    }
+  }
+}

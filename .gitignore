@@ -1,0 +1,6 @@
+node_modules
+dist
+build
+pyi_work
+__pycache__
+*.db
